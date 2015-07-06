@@ -1,3 +1,6 @@
+// Base class for implementation
+
+
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 

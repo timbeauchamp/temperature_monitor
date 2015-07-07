@@ -46,6 +46,7 @@ public class Raspberry implements HardwareInterface
         for(Pin pin : pins)
         {
             myLed[index] = gpio.provisionDigitalOutputPin(pin, pin.getName(), PinState.LOW);
+            index++;
         }
 
 // create a gpio control trigger on the input pin ; when the input goes
@@ -149,7 +150,12 @@ public class Raspberry implements HardwareInterface
                 pins=1;
             write(GPIOA,  (byte)pins);
             pins = pins << 1;
-            Thread.sleep(1000);
+            try {
+				Thread.sleep(1000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             
             // read for input changes
             //read(INPUT_PORT);

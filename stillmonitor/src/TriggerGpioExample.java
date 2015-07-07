@@ -44,9 +44,9 @@ public class TriggerGpioExample
 
         Pin[] pins = new Pin[4];
         pins[0] = RaspiPin.GPIO_04;
-        pins[0] = RaspiPin.GPIO_05;
-        pins[0] = RaspiPin.GPIO_06;
-        pins[0] = RaspiPin.GPIO_07;
+        pins[1] = RaspiPin.GPIO_05;
+        pins[2] = RaspiPin.GPIO_06;
+        pins[3] = RaspiPin.GPIO_07;
 
         hardware.provision(pins);
 

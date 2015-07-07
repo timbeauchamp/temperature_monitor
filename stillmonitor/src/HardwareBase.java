@@ -46,6 +46,7 @@ public class HardwareBase implements HardwareInterface
     @Override
     public void provision(Pin[] pins)
     {
+    	actualHardware.provision(pins);
 
     }
 

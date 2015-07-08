@@ -124,24 +124,40 @@ public class Raspberry implements HardwareInterface
             System.out.println(" ==>> SPI SETUP FAILED");
             return -50.0;
         }
+        int data = read(channel);
+        
+        double temperature = data2Temp(data);
 
-        return read(channel);
+        return temperature;
+    }
+    
+    public static double data2Temp(int data)
+    {
+
+        int mv =  (data * 3300)/ 0x3FF;
+        double temperature = (double)(mv - 500) / 10;
+        return temperature;    	
     }
 
     public static int read(int channel)
     {
         byte packet[] = new byte[3];
         packet[0] = 1;    // address byte
-        packet[1] = (byte)((8 + channel) << 4);    // register byte
+        packet[1] = (byte) ((8 + channel) << 4);    // register byte
         packet[2] = 0b00000000;  // data byte
         
-        System.out.println("-----------------------------------------------");
-        System.out.println("[TX] " + bytesToHex(packet));
+//        System.out.println("[TX] " + bytesToHex(packet));
         Spi.wiringPiSPIDataRW(0, packet, 3);
-        System.out.println("[RX] " + bytesToHex(packet));
-        System.out.println("-----------------------------------------------");
+//        System.out.println("[RX] " + bytesToHex(packet));
+        
+        int msb = packet[1] & 3;
+        int lsb = packet[2];
+        if(lsb < 0)
+        {
+        	lsb = (int)(packet[2] & 0x7F) + 128;
+        }
 
-        int result = ((packet[1]&3) << 8) + packet[2];
+        int result = (msb << 8) + lsb;
         return result;
     }
 

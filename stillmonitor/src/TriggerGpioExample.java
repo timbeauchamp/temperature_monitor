@@ -53,9 +53,12 @@ public class TriggerGpioExample
 // keep program running until user aborts (CTRL-C)
         for (;;)
         {
-            Thread.sleep(500);
-            advanceLights();
-            hardware.getTemp(0);
+            Thread.sleep(1000);
+ //           advanceLights();
+            double temp1 = hardware.getTemp(0);
+            double temp2 = hardware.getTemp(1);
+            System.out.println("Temp 1: " + temp1 + "    " + "Temp 2: " + temp2);
+            
         }
 
 // stop all GPIO activity/threads by shutting down the GPIO controller

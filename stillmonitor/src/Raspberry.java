@@ -115,14 +115,21 @@ public class Raspberry implements HardwareInterface
     private static final byte INPUT_PORT  = GPIOB;
     private static final byte INPUT_PULLUPS = GPPUB;
     
-    private static void getTemps() throws InterruptedException
+    public double getTemp(int channel)
     {
+        // setup SPI for communication
+        int fd = Spi.wiringPiSPISetup(0, 10000000);
+        if (fd <= -1)
+        {
+            System.out.println(" ==>> SPI SETUP FAILED");
+            return -50.0;
+        }
+
+        return read(INPUT_PORT);
     }
     
     public static void testSPI()
     {
-        
-        
         // setup SPI for communication
         int fd = Spi.wiringPiSPISetup(0, 10000000);
         if (fd <= -1) {
@@ -177,7 +184,7 @@ public class Raspberry implements HardwareInterface
         System.out.println("-----------------------------------------------");
     }
     
-    public static void read(byte register){
+    public static int read(byte register){
         
         // send test ASCII message
         byte packet[] = new byte[3];
@@ -190,6 +197,8 @@ public class Raspberry implements HardwareInterface
         Spi.wiringPiSPIDataRW(0, packet, 3);
         System.out.println("[RX] " + bytesToHex(packet));
         System.out.println("-----------------------------------------------");
+
+        return 0;
     }
     
     public static String bytesToHex(byte[] bytes) {

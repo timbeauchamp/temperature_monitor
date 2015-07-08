@@ -36,6 +36,11 @@ public class HardwareBase implements HardwareInterface
             System.out.println("Not a Raspberry");
             return false;
         }
+        else if(osName.toLowerCase().contains("mac"))
+        {
+            System.out.println("Not a Raspberry");
+            return false;
+        }
         else
         {
             System.out.println("Assuming a Raspberry");
@@ -61,5 +66,11 @@ public class HardwareBase implements HardwareInterface
     {
 
         return actualHardware.getPinState(pin);
+    }
+
+    @Override
+    public double getTemp(int channel)
+    {
+        return actualHardware.getTemp(channel);
     }
 }

@@ -55,6 +55,7 @@ public class TriggerGpioExample
         {
             Thread.sleep(500);
             advanceLights();
+            hardware.getTemp(0);
         }
 
 // stop all GPIO activity/threads by shutting down the GPIO controller

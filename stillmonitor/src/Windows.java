@@ -34,4 +34,10 @@ public class Windows implements HardwareInterface
 
         return null;
     }
+
+    @Override
+    public double getTemp(int channel)
+    {
+        return 0;
+    }
 }

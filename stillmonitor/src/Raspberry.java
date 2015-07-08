@@ -127,7 +127,24 @@ public class Raspberry implements HardwareInterface
 
         return read(INPUT_PORT);
     }
-    
+
+    public static int read(byte register){
+        
+        // send test ASCII message
+        byte packet[] = new byte[3];
+        packet[0] = READ_CMD;    // address byte
+        packet[1] = register;    // register byte
+        packet[2] = 0b00000000;  // data byte
+        
+        System.out.println("-----------------------------------------------");
+        System.out.println("[TX] " + bytesToHex(packet));
+        Spi.wiringPiSPIDataRW(0, packet, 3);
+        System.out.println("[RX] " + bytesToHex(packet));
+        System.out.println("-----------------------------------------------");
+
+        return 0;
+    }
+
     public static void testSPI()
     {
         // setup SPI for communication
@@ -182,24 +199,7 @@ public class Raspberry implements HardwareInterface
         Spi.wiringPiSPIDataRW(0, packet, 3);
         System.out.println("[RX] " + bytesToHex(packet));
         System.out.println("-----------------------------------------------");
-    }
-    
-    public static int read(byte register){
-        
-        // send test ASCII message
-        byte packet[] = new byte[3];
-        packet[0] = READ_CMD;    // address byte
-        packet[1] = register;    // register byte
-        packet[2] = 0b00000000;  // data byte
-        
-        System.out.println("-----------------------------------------------");
-        System.out.println("[TX] " + bytesToHex(packet));
-        Spi.wiringPiSPIDataRW(0, packet, 3);
-        System.out.println("[RX] " + bytesToHex(packet));
-        System.out.println("-----------------------------------------------");
-
-        return 0;
-    }
+    }    
     
     public static String bytesToHex(byte[] bytes) {
         final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};

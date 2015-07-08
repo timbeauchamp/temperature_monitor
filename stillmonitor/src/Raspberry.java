@@ -125,15 +125,14 @@ public class Raspberry implements HardwareInterface
             return -50.0;
         }
 
-        return read(INPUT_PORT);
+        return read(channel);
     }
 
-    public static int read(byte register){
-        
-        // send test ASCII message
+    public static int read(int channel)
+    {
         byte packet[] = new byte[3];
-        packet[0] = READ_CMD;    // address byte
-        packet[1] = register;    // register byte
+        packet[0] = 1;    // address byte
+        packet[1] = (byte)((8 + channel) << 4);    // register byte
         packet[2] = 0b00000000;  // data byte
         
         System.out.println("-----------------------------------------------");
@@ -142,65 +141,10 @@ public class Raspberry implements HardwareInterface
         System.out.println("[RX] " + bytesToHex(packet));
         System.out.println("-----------------------------------------------");
 
-        return 0;
+        int result = ((packet[1]&3) << 8) + packet[2];
+        return result;
     }
 
-    public static void testSPI()
-    {
-        // setup SPI for communication
-        int fd = Spi.wiringPiSPISetup(0, 10000000);
-        if (fd <= -1) {
-            System.out.println(" ==>> SPI SETUP FAILED");
-            return;
-        }
-        
-        // initialize
-        write(IOCON,  0x08);  // enable hardware addressing
-        write(GPIOA,  0x00);  // set port A off
-        write(IODIRA, 0);     // set port A as outputs
-        write(IODIRB, 0xFF);  // set port B as inputs
-        write(GPPUB,  0xFF);  // set port B pullups on
-        
-        int pins = 1;
-        
-        // infinite loop
-        while(true)
-        {
-            
-            // shift the bit to the left in the A register
-            // this will cause the next LED to light up and
-            // the current LED to turn off.
-            if(pins >= 255)
-                pins=1;
-            write(GPIOA,  (byte)pins);
-            pins = pins << 1;
-            try {
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-            
-            // read for input changes
-            //read(INPUT_PORT);
-        }
-    }
-    
-    public static void write(byte register, int data){
-        
-        // send test ASCII message
-        byte packet[] = new byte[3];
-        packet[0] = WRITE_CMD;  // address byte
-        packet[1] = register;  // register byte
-        packet[2] = (byte)data;  // data byte
-        
-        System.out.println("-----------------------------------------------");
-        System.out.println("[TX] " + bytesToHex(packet));
-        Spi.wiringPiSPIDataRW(0, packet, 3);
-        System.out.println("[RX] " + bytesToHex(packet));
-        System.out.println("-----------------------------------------------");
-    }    
-    
     public static String bytesToHex(byte[] bytes) {
         final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
         char[] hexChars = new char[bytes.length * 2];
@@ -212,6 +156,5 @@ public class Raspberry implements HardwareInterface
         }
         return new String(hexChars);
     }
-
 
 }

@@ -99,25 +99,25 @@ public class Raspberry implements HardwareInterface
         return myLed[pin].getState();
     }
 
-    // SPI operations
-    public static byte WRITE_CMD = 0x40;
-    public static byte READ_CMD  = 0x41;
-    
-    // configuration
-    private static final byte IODIRA = 0x00; // I/O direction A
-    private static final byte IODIRB = 0x01; // I/O direction B
-    private static final byte IOCON  = 0x0A; // I/O config
-    private static final byte GPIOA  = 0x12; // port A
-    private static final byte GPIOB  = 0x13; // port B
-    private static final byte GPPUA  = 0x0C; // port A pullups
-    private static final byte GPPUB  = 0x0D; // port B pullups
-    private static final byte OUTPUT_PORT = GPIOA;
-    private static final byte INPUT_PORT  = GPIOB;
-    private static final byte INPUT_PULLUPS = GPPUB;
+//    // SPI operations
+//    public static byte WRITE_CMD = 0x40;
+//    public static byte READ_CMD  = 0x41;
+//    
+//    // configuration
+//    private static final byte IODIRA = 0x00; // I/O direction A
+//    private static final byte IODIRB = 0x01; // I/O direction B
+//    private static final byte IOCON  = 0x0A; // I/O config
+//    private static final byte GPIOA  = 0x12; // port A
+//    private static final byte GPIOB  = 0x13; // port B
+//    private static final byte GPPUA  = 0x0C; // port A pullups
+//    private static final byte GPPUB  = 0x0D; // port B pullups
+//    private static final byte OUTPUT_PORT = GPIOA;
+//    private static final byte INPUT_PORT  = GPIOB;
+//    private static final byte INPUT_PULLUPS = GPPUB;
     
     public double getTemp(int channel)
     {
-        // setup SPI for communication
+        // setup SPI
         int fd = Spi.wiringPiSPISetup(0, 10000000);
         if (fd <= -1)
         {
@@ -130,32 +130,52 @@ public class Raspberry implements HardwareInterface
 
         return temperature;
     }
+
+    public double getRange(int channel)
+    {
+        // setup SPI
+      
+    	int fd = Spi.wiringPiSPISetup(0, 10000000);
+        if (fd <= -1)
+        {
+            System.out.println(" ==>> SPI SETUP FAILED");
+            return -50.0;
+        }
+        int data = read(channel);
+        double range = (double)data/1024d;
+
+    	return range;
+    }
     
     public static double data2Temp(int data)
     {
-
-        int mv =  (data * 3300)/ 0x3FF;
+        int mv =  (data * 3300)/ 0x400;
         double temperature = (double)(mv - 500) / 10;
+//    	System.out.println("Data:" + data + "  mV:" + mv + "  Temp:" + temperature);
         return temperature;    	
+    }
+    
+    public static int byte2Int(byte in)
+    {
+    	int out = 0;
+    	int sBit = in & 128;
+    	out = in & 127;
+    	out += sBit;
+    	return out;
     }
 
     public static int read(int channel)
     {
         byte packet[] = new byte[3];
         packet[0] = 1;    // address byte
-        packet[1] = (byte) ((8 + channel) << 4);    // register byte
+        packet[1] = (byte) ((8 + channel) << 4);    // channel and diff
         packet[2] = 0b00000000;  // data byte
         
 //        System.out.println("[TX] " + bytesToHex(packet));
         Spi.wiringPiSPIDataRW(0, packet, 3);
 //        System.out.println("[RX] " + bytesToHex(packet));
-        
         int msb = packet[1] & 3;
-        int lsb = packet[2];
-        if(lsb < 0)
-        {
-        	lsb = (int)(packet[2] & 0x7F) + 128;
-        }
+        int lsb = byte2Int(packet[2]);
 
         int result = (msb << 8) + lsb;
         return result;

@@ -73,4 +73,11 @@ public class HardwareBase implements HardwareInterface
     {
         return actualHardware.getTemp(channel);
     }
+
+    @Override
+    public double getRange(int channel)
+    {
+        return actualHardware.getRange(channel);
+    }
+
 }

@@ -12,4 +12,5 @@ public interface HardwareInterface
     public PinState getPinState(int pin);
 
     public double getTemp(int channel);
+    public double getRange(int channel);
 }

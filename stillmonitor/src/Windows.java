@@ -40,4 +40,10 @@ public class Windows implements HardwareInterface
     {
         return 0;
     }
+    
+    @Override
+    public double getRange(int channel)
+    {
+        return 0;
+    }
 }

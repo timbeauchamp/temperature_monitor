@@ -11,6 +11,7 @@ public interface HardwareInterface
     public void setPinState(int pin, PinState state);
     public PinState getPinState(int pin);
 
-    public double getTemp(int channel);
+//    public double getTemp(int channel);
     public double getRange(int channel);
+    public int readSPI(int channel);
 }

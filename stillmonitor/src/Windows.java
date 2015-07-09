@@ -36,13 +36,13 @@ public class Windows implements HardwareInterface
     }
 
     @Override
-    public double getTemp(int channel)
+    public double getRange(int channel)
     {
         return 0;
     }
-    
+
     @Override
-    public double getRange(int channel)
+    public int readSPI(int channel)
     {
         return 0;
     }

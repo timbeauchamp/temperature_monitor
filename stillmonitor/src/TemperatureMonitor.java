@@ -5,6 +5,7 @@ import com.pi4j.io.gpio.trigger.GpioCallbackTrigger;
 import com.pi4j.io.gpio.trigger.GpioPulseStateTrigger;
 import com.pi4j.io.gpio.trigger.GpioSetStateTrigger;
 import com.pi4j.io.gpio.trigger.GpioSyncStateTrigger;
+import com.pi4j.wiringpi.Spi;
 
 
 public class TemperatureMonitor
@@ -41,7 +42,6 @@ public class TemperatureMonitor
 
     public static void main(String[] args) throws InterruptedException
     {
-
         Pin[] pins = new Pin[4];
         pins[0] = RaspiPin.GPIO_04;
         pins[1] = RaspiPin.GPIO_05;
@@ -50,22 +50,15 @@ public class TemperatureMonitor
 
         hardware.provision(pins);
 
-// keep program running until user aborts (CTRL-C)
         for (;;)
         {
             Thread.sleep(2000);
             advanceLights();
-            double temp0 = hardware.getTemp(0);
-            double temp1 = hardware.getTemp(1);
+            double temp0 = getTemp(0);
+            double temp1 = getTemp(1);
             double range = hardware.getRange(2);
             System.out.println("Temp0:" + temp0 + " Temp1: " + temp1 + " Range: " + range);
         }
-
-// stop all GPIO activity/threads by shutting down the GPIO controller
-// (this method will forcefully shutdown all GPIO monitoring threads and
-// scheduled tasks)
-// gpio.shutdown();// <--- implement this method call if you wish to
-// terminate the Pi4J GPIO controller
     }
 
     static void advanceLights()
@@ -82,7 +75,23 @@ public class TemperatureMonitor
             lights = sLights[sState];
             hardware.setPinState(i, lights[i]);
         }
+    }
 
+    public static double data2Temp(int data)
+    {
+        int mv =  (data * 3300)/ 0x400;
+        double temperature = (double)(mv - 500) / 10;
+//    	System.out.println("Data:" + data + "  mV:" + mv + "  Temp:" + temperature);
+        return temperature;
+    }
+
+    public static double getTemp(int channel)
+    {
+        int data = hardware.readSPI(channel);
+
+        double temperature = data2Temp(data);
+
+        return temperature;
     }
 
 }

@@ -69,15 +69,15 @@ public class HardwareBase implements HardwareInterface
     }
 
     @Override
-    public double getTemp(int channel)
-    {
-        return actualHardware.getTemp(channel);
-    }
-
-    @Override
     public double getRange(int channel)
     {
         return actualHardware.getRange(channel);
+    }
+
+    @Override
+    public int readSPI(int channel)
+    {
+        return actualHardware.readSPI(channel);
     }
 
 }

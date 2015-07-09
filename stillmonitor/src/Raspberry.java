@@ -30,7 +30,6 @@ public class Raspberry implements HardwareInterface
     @Override
     public void provision(Pin[] pins)
     {
-
         // provision gpio pin #2 as an input pin with its internal pull down
         // resistor enabled
         final GpioPinDigitalInput myButton = gpio.provisionDigitalInputPin(
@@ -115,21 +114,6 @@ public class Raspberry implements HardwareInterface
 //    private static final byte INPUT_PORT  = GPIOB;
 //    private static final byte INPUT_PULLUPS = GPPUB;
     
-    public double getTemp(int channel)
-    {
-        // setup SPI
-        int fd = Spi.wiringPiSPISetup(0, 10000000);
-        if (fd <= -1)
-        {
-            System.out.println(" ==>> SPI SETUP FAILED");
-            return -50.0;
-        }
-        int data = read(channel);
-        
-        double temperature = data2Temp(data);
-
-        return temperature;
-    }
 
     public double getRange(int channel)
     {
@@ -141,30 +125,20 @@ public class Raspberry implements HardwareInterface
             System.out.println(" ==>> SPI SETUP FAILED");
             return -50.0;
         }
-        int data = read(channel);
+        int data = readSPI(channel);
         double range = (double)data/1024d;
 
     	return range;
     }
     
-    public static double data2Temp(int data)
+
+    public static int toUnsigned(byte in)
     {
-        int mv =  (data * 3300)/ 0x400;
-        double temperature = (double)(mv - 500) / 10;
-//    	System.out.println("Data:" + data + "  mV:" + mv + "  Temp:" + temperature);
-        return temperature;    	
-    }
-    
-    public static int byte2Int(byte in)
-    {
-    	int out = 0;
-    	int sBit = in & 128;
-    	out = in & 127;
-    	out += sBit;
-    	return out;
+        return in & 0xFF;
     }
 
-    public static int read(int channel)
+
+    public int readSPI(int channel)
     {
         byte packet[] = new byte[3];
         packet[0] = 1;    // address byte
@@ -175,7 +149,7 @@ public class Raspberry implements HardwareInterface
         Spi.wiringPiSPIDataRW(0, packet, 3);
 //        System.out.println("[RX] " + bytesToHex(packet));
         int msb = packet[1] & 3;
-        int lsb = byte2Int(packet[2]);
+        int lsb = toUnsigned(packet[2]);
 
         int result = (msb << 8) + lsb;
         return result;

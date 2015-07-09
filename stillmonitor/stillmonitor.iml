@@ -10,14 +10,14 @@
     <orderEntry type="module-library">
       <library>
         <CLASSES>
-          <root url="file://C:/Java/pi4j-1.0/lib" />
+          <root url="file://C:/java/pi4j-1.0/lib" />
         </CLASSES>
         <JAVADOC />
         <SOURCES>
-          <root url="file://C:/Java/pi4j-1.0/lib" />
+          <root url="file://C:/java/pi4j-1.0/lib" />
         </SOURCES>
-        <jarDirectory url="file://C:/Java/pi4j-1.0/lib" recursive="false" />
-        <jarDirectory url="file://C:/Java/pi4j-1.0/lib" recursive="false" type="SOURCES" />
+        <jarDirectory url="file://C:/java/pi4j-1.0/lib" recursive="false" />
+        <jarDirectory url="file://C:/java/pi4j-1.0/lib" recursive="false" type="SOURCES" />
       </library>
     </orderEntry>
   </component>

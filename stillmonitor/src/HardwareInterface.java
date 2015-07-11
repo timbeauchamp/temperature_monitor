@@ -7,6 +7,7 @@ import com.pi4j.io.gpio.PinState;
 public interface HardwareInterface
 {
     public String platform = "";
+    public String getWWW_ROOT();
     public void provision(Pin[] pins);
     public void setPinState(int pin, PinState state);
     public PinState getPinState(int pin);

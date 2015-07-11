@@ -17,6 +17,12 @@ public class Windows implements HardwareInterface
 
 
     @Override
+    public String getWWW_ROOT()
+    {
+        return "c:/www";
+    }
+
+    @Override
     public void provision(Pin[] pins)
     {
 
@@ -38,12 +44,12 @@ public class Windows implements HardwareInterface
     @Override
     public double getRange(int channel)
     {
-        return 0;
+        return .7;
     }
 
     @Override
     public int readSPI(int channel)
     {
-        return 0;
+        return 512;
     }
 }

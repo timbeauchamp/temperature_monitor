@@ -28,6 +28,12 @@ public class Raspberry implements HardwareInterface
     }
 
     @Override
+    public String getWWW_ROOT()
+    {
+        return "/var/www";
+    }
+
+    @Override
     public void provision(Pin[] pins)
     {
         // provision gpio pin #2 as an input pin with its internal pull down

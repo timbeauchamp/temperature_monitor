@@ -13,10 +13,7 @@ import com.pi4j.io.gpio.RaspiPin;
 public class MCP3008Reader
 {
   private final static boolean DISPLAY_DIGIT = "true".equals(System.getProperty("display.digit", "false"));
-  // Note: "Mismatch" 23-24. The wiring says DOUT->#23, DIN->#24
-  // 23: DOUT on the ADC is IN on the GPIO. ADC:Slave, GPIO:Master
-  // 24: DIN on the ADC, OUT on the GPIO. Same reason as above.
-  // SPI: Serial Peripheral Interface
+
   private static Pin spiClk  = RaspiPin.GPIO_01; // Pin #18, clock
   private static Pin spiMiso = RaspiPin.GPIO_04; // Pin #23, data in.  MISO: Master In Slave Out
   private static Pin spiMosi = RaspiPin.GPIO_05; // Pin #24, data out. MOSI: Master Out Slave In

@@ -7,19 +7,18 @@ import com.pi4j.io.gpio.PinState;
 /**
  * Created by tbeauch on 7/6/2015.
  */
-public class HardwareBase implements HardwareInterface
+public  class HardwareBase implements HardwareInterface
 {
     HardwareInterface actualHardware = null;
     public String platform = "";
 
     public HardwareBase()
     {
-        if(isRaspberry())
+        if (isRaspberry())
         {
             actualHardware = new Raspberry();
 
-        }
-        else
+        } else
         {
             actualHardware = new Windows();
         }
@@ -31,17 +30,15 @@ public class HardwareBase implements HardwareInterface
         System.out.println(osName);
         ;
 
-        if(osName.toLowerCase().contains("windows"))
+        if (osName.toLowerCase().contains("windows"))
         {
             System.out.println("Not a Raspberry");
             return false;
-        }
-        else if(osName.toLowerCase().contains("mac"))
+        } else if (osName.toLowerCase().contains("mac"))
         {
             System.out.println("Not a Raspberry");
             return false;
-        }
-        else
+        } else
         {
             System.out.println("Assuming a Raspberry");
             return true;
@@ -49,9 +46,15 @@ public class HardwareBase implements HardwareInterface
     }
 
     @Override
+    public String getWWW_ROOT()
+    {
+        return actualHardware.getWWW_ROOT();
+    }
+
+    @Override
     public void provision(Pin[] pins)
     {
-    	actualHardware.provision(pins);
+        actualHardware.provision(pins);
 
     }
 

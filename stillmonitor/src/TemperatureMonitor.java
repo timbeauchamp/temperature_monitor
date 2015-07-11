@@ -1,3 +1,10 @@
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.concurrent.Callable;
 
 import com.pi4j.io.gpio.*;
@@ -38,7 +45,9 @@ public class TemperatureMonitor
     };
     private static int sState = 0;
 
-    static HardwareBase hardware = new HardwareBase();
+    private static String dataFileName = "temps.xml";
+
+    private static HardwareBase hardware = new HardwareBase();
 
     public static void main(String[] args) throws InterruptedException
     {
@@ -49,15 +58,33 @@ public class TemperatureMonitor
         pins[3] = RaspiPin.GPIO_07;
 
         hardware.provision(pins);
+        double[] temps = new double[4];
+        double[] ranges = new double[4];
+        boolean[] switches = new boolean[4];
 
         for (;;)
         {
             Thread.sleep(2000);
             advanceLights();
-            double temp0 = getTemp(0);
-            double temp1 = getTemp(1);
-            double range = hardware.getRange(2);
-            System.out.println("Temp0:" + temp0 + " Temp1: " + temp1 + " Range: " + range);
+            temps[0] = getTemp(0);
+            temps[1] = getTemp(1);
+            temps[2] = 0;
+            temps[3] = 0;
+
+            ranges[0] = hardware.getRange(2);
+            ranges[1] = hardware.getRange(3);
+            ranges[2] = hardware.getRange(4);
+            ranges[3] = 0;
+
+            switches[0] = false;
+            switches[1] = true;
+            switches[2] = false;
+            switches[3] = true;
+
+            System.out.println("Temp0:" + temps[0] + " Temp1: " + temps[1] + " Range: " + ranges[0] + " switch: " + switches[0]);
+
+            String dataStr = createXML(temps, ranges, switches);
+            writeData2File(dataStr);
         }
     }
 
@@ -92,6 +119,65 @@ public class TemperatureMonitor
         double temperature = data2Temp(data);
 
         return temperature;
+    }
+
+    public static void writeData2File(String dataStr)
+    {
+
+        String wwwRoot = hardware.getWWW_ROOT();
+        Path filePath = Paths.get(wwwRoot, dataFileName);
+        Charset charset = Charset.forName("US-ASCII");
+
+        try (BufferedWriter writer = Files.newBufferedWriter(filePath, charset))
+        {
+            writer.write(dataStr, 0, dataStr.length());
+        } catch (IOException x)
+        {
+            System.err.format("IOException: %s%n", x);
+        }
+    }
+
+    private static String createXML(double[] temps, double[]ranges, boolean[] switches)
+    {
+        StringBuffer retStr = new StringBuffer();
+        retStr.append("<data>\n\t<temps>\n");
+
+        int index = 0;
+        for(double temp : temps)
+        {
+            retStr.append("\t\t<temp id='");
+            retStr.append(index++);
+            retStr.append("'>");
+            retStr.append(temp);
+            retStr.append("</temp>\n");
+        }
+        retStr.append("\t</temps>\n");
+        retStr.append("\t<ranges>\n");
+        index = 0;
+        for(double range : ranges)
+        {
+            retStr.append("\t\t<range id='");
+            retStr.append(index++);
+            retStr.append("'>");
+            retStr.append(range);
+            retStr.append("</range>\n");
+        }
+        retStr.append("\t</ranges>\n");
+
+        retStr.append("\t<switches>\n");
+        index = 0;
+        for(boolean aSwitch : switches)
+        {
+            retStr.append("\t\t<switch id='");
+            retStr.append(index++);
+            retStr.append("'>");
+            retStr.append(aSwitch);
+            retStr.append("</switch>\n");
+        }
+        retStr.append("\t</switches>\n");
+        retStr.append("</data>\n");
+
+        return retStr.toString();
     }
 
 }

@@ -10,7 +10,6 @@ import com.pi4j.io.gpio.trigger.GpioCallbackTrigger;
 import com.pi4j.io.gpio.trigger.GpioPulseStateTrigger;
 import com.pi4j.io.gpio.trigger.GpioSetStateTrigger;
 import com.pi4j.io.gpio.trigger.GpioSyncStateTrigger;
-import com.pi4j.wiringpi.Spi;
 
 
 public class Raspberry implements HardwareInterface
@@ -30,6 +29,8 @@ public class Raspberry implements HardwareInterface
     @Override
     public void provision(Pin[] pins)
     {
+    	MCP3008Reader.initMCP3008();
+
         // provision gpio pin #2 as an input pin with its internal pull down
         // resistor enabled
         final GpioPinDigitalInput myButton = gpio.provisionDigitalInputPin(
@@ -101,59 +102,17 @@ public class Raspberry implements HardwareInterface
     public double getRange(int channel)
     {
         int data = readSPI(channel);
-        double range = (double)data/1024d;
+        double range = (double)data/1024;
 
     	return range;
     }
-    
-
-    public static int toUnsigned(byte in)
-    {
-        return in & 0xFF;
-    }
-
 
     public int readSPI(int channel)
     {
-        // setup SPI
-        
-    	int fd = Spi.wiringPiSPISetup(0, 10000000);
-        if (fd <= -1)
-        {
-            System.out.println(" ==>> SPI SETUP FAILED");
-            return 0;
-        }
+    	int retVal = 0;
+    	retVal = MCP3008Reader.readMCP3008(channel);
 
-
-
-        byte packet[] = new byte[4];
-        packet[0] = 1;    // address byte
-        packet[1] = (byte) ((0x8 | channel) << 4);    // channel and diff
-        
-        packet[2] = 0b00000000;  // buffer
-        packet[3] = 0b00000000;  // buffer
-        
-//        System.out.println("[TX] " + bytesToHex(packet));
-        Spi.wiringPiSPIDataRW(0, packet);
-        System.out.println("[RX] " + bytesToHex(packet));
-        int msb = packet[1] & 3;
-        int lsb = toUnsigned(packet[2]);
-
-        int result = (msb << 8) + lsb;
-
-        return result;
-    }
-
-    public static String bytesToHex(byte[] bytes) {
-        final char[] hexArray = {'0','1','2','3','4','5','6','7','8','9','A','B','C','D','E','F'};
-        char[] hexChars = new char[bytes.length * 2];
-        int v;
-        for ( int j = 0; j < bytes.length; j++ ) {
-            v = bytes[j] & 0xFF;
-            hexChars[j * 2] = hexArray[v >>> 4];
-            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
-        }
-        return new String(hexChars);
+        return retVal;
     }
 
 }

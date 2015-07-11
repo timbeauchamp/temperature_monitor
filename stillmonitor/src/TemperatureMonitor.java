@@ -49,15 +49,17 @@ public class TemperatureMonitor
         pins[3] = RaspiPin.GPIO_07;
 
         hardware.provision(pins);
+        
+        double range = 0.0;
 
         for (;;)
         {
-            Thread.sleep(2000);
+            Thread.sleep(10 + (int)(range * 10000));
             advanceLights();
             double temp0 = getTemp(0);
             double temp1 = getTemp(1);
-            double range = hardware.getRange(2);
-            System.out.println("Temp0:" + temp0 + " Temp1: " + temp1 + " Range: " + range);
+            range = hardware.getRange(2);
+            System.out.println("Temp0:" + temp0 + "(" + (temp0 * 1.9 + 32) + " F)  Temp1: " + temp1 + "(" + (temp0 * 1.9 + 32) + " F)   Range: " + range);
         }
     }
 

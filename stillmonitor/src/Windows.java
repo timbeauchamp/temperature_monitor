@@ -1,6 +1,8 @@
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinState;
 
+import java.util.Random;
+
 /**
  * Created by tbeauch on 7/6/2015.
  */
@@ -9,10 +11,11 @@ import com.pi4j.io.gpio.PinState;
 public class Windows implements HardwareInterface
 {
     public String platform = "Windows";
+    private static Random rand;
 
     public Windows()
     {
-
+        rand = new Random();
     }
 
 
@@ -37,19 +40,18 @@ public class Windows implements HardwareInterface
     @Override
     public PinState getPinState(int pin)
     {
-
-        return null;
+        return PinState.getState(rand.nextBoolean());
     }
 
     @Override
     public double getRange(int channel)
     {
-        return .7;
+        return rand.nextDouble();
     }
 
     @Override
     public int readSPI(int channel)
     {
-        return 512;
+        return 165 + rand.nextInt(85);
     }
 }

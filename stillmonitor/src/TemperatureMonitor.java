@@ -49,23 +49,38 @@ public class TemperatureMonitor
 
     private static HardwareBase hardware = new HardwareBase();
 
-    public static void main(String[] args) throws InterruptedException
+    public static void main(String[] args)
     {
-        Pin[] pins = new Pin[4];
+        Pin[] pins = new Pin[8];
         pins[0] = RaspiPin.GPIO_04;
         pins[1] = RaspiPin.GPIO_05;
         pins[2] = RaspiPin.GPIO_06;
         pins[3] = RaspiPin.GPIO_07;
 
+        pins[4] = RaspiPin.GPIO_21;
+        pins[5] = RaspiPin.GPIO_22;
+        pins[6] = RaspiPin.GPIO_23;
+        pins[7] = RaspiPin.GPIO_24;
+
         hardware.provision(pins);
+
         double[] temps = new double[4];
         double[] ranges = new double[4];
         boolean[] switches = new boolean[4];
 
+        double range = 0.0;
+
         for (;;)
         {
-            Thread.sleep(2000);
+            try
+            {
+                Thread.sleep(10 + (int)(range * 10000));
+            } catch (InterruptedException e)
+            {
+                e.printStackTrace();
+            }
             advanceLights();
+
             temps[0] = getTemp(0);
             temps[1] = getTemp(1);
             temps[2] = 0;
@@ -76,15 +91,17 @@ public class TemperatureMonitor
             ranges[2] = hardware.getRange(4);
             ranges[3] = 0;
 
-            switches[0] = false;
-            switches[1] = true;
-            switches[2] = false;
-            switches[3] = true;
+            switches[0] = hardware.getPinState(4).isHigh();
+            switches[1] = hardware.getPinState(5).isHigh();
+            switches[2] = hardware.getPinState(6).isHigh();
+            switches[3] = hardware.getPinState(7).isHigh();
 
-            System.out.println("Temp0:" + temps[0] + " Temp1: " + temps[1] + " Range: " + ranges[0] + " switch: " + switches[0]);
+            System.out.println("Temp0:" + temps[0] + "(" +(temps[0] * 1.9 + 32) + " F)   Temp1: " + temps[1] + "(" +(temps[1] * 1.9 + 32) + " F)   Range: " + ranges[0] + " switch: " + switches[0]);
 
             String dataStr = createXML(temps, ranges, switches);
             writeData2File(dataStr);
+
+            range = ranges[0];
         }
     }
 

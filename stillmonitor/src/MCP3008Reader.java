@@ -13,11 +13,11 @@ import com.pi4j.io.gpio.RaspiPin;
 public class MCP3008Reader
 {
   private final static boolean DISPLAY_DIGIT = "true".equals(System.getProperty("display.digit", "false"));
-
-  private static Pin spiClk  = RaspiPin.GPIO_01; // Pin #18, clock
-  private static Pin spiMiso = RaspiPin.GPIO_04; // Pin #23, data in.  MISO: Master In Slave Out
-  private static Pin spiMosi = RaspiPin.GPIO_05; // Pin #24, data out. MOSI: Master Out Slave In
-  private static Pin spiCs   = RaspiPin.GPIO_06; // Pin #25, Chip Select
+  // SPI: Serial Peripheral Interface
+  private static Pin spiClk  = RaspiPin.GPIO_14; // Pin #14, clock
+  private static Pin spiMiso = RaspiPin.GPIO_13; // Pin #13, data in.  MISO: Master In Slave Out
+  private static Pin spiMosi = RaspiPin.GPIO_12; // Pin #12, data out. MOSI: Master Out Slave In
+  private static Pin spiCs   = RaspiPin.GPIO_10; // Pin #10, Chip Select
  
   public enum MCP3008_input_channels
   {

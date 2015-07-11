@@ -97,34 +97,9 @@ public class Raspberry implements HardwareInterface
     {
         return myLed[pin].getState();
     }
-
-//    // SPI operations
-//    public static byte WRITE_CMD = 0x40;
-//    public static byte READ_CMD  = 0x41;
-//    
-//    // configuration
-//    private static final byte IODIRA = 0x00; // I/O direction A
-//    private static final byte IODIRB = 0x01; // I/O direction B
-//    private static final byte IOCON  = 0x0A; // I/O config
-//    private static final byte GPIOA  = 0x12; // port A
-//    private static final byte GPIOB  = 0x13; // port B
-//    private static final byte GPPUA  = 0x0C; // port A pullups
-//    private static final byte GPPUB  = 0x0D; // port B pullups
-//    private static final byte OUTPUT_PORT = GPIOA;
-//    private static final byte INPUT_PORT  = GPIOB;
-//    private static final byte INPUT_PULLUPS = GPPUB;
     
-
     public double getRange(int channel)
     {
-        // setup SPI
-      
-    	int fd = Spi.wiringPiSPISetup(0, 10000000);
-        if (fd <= -1)
-        {
-            System.out.println(" ==>> SPI SETUP FAILED");
-            return -50.0;
-        }
         int data = readSPI(channel);
         double range = (double)data/1024d;
 
@@ -140,18 +115,32 @@ public class Raspberry implements HardwareInterface
 
     public int readSPI(int channel)
     {
-        byte packet[] = new byte[3];
+        // setup SPI
+        
+    	int fd = Spi.wiringPiSPISetup(0, 10000000);
+        if (fd <= -1)
+        {
+            System.out.println(" ==>> SPI SETUP FAILED");
+            return 0;
+        }
+
+
+
+        byte packet[] = new byte[4];
         packet[0] = 1;    // address byte
-        packet[1] = (byte) ((8 + channel) << 4);    // channel and diff
-        packet[2] = 0b00000000;  // data byte
+        packet[1] = (byte) ((0x8 | channel) << 4);    // channel and diff
+        
+        packet[2] = 0b00000000;  // buffer
+        packet[3] = 0b00000000;  // buffer
         
 //        System.out.println("[TX] " + bytesToHex(packet));
-        Spi.wiringPiSPIDataRW(0, packet, 3);
-//        System.out.println("[RX] " + bytesToHex(packet));
+        Spi.wiringPiSPIDataRW(0, packet);
+        System.out.println("[RX] " + bytesToHex(packet));
         int msb = packet[1] & 3;
         int lsb = toUnsigned(packet[2]);
 
         int result = (msb << 8) + lsb;
+
         return result;
     }
 
